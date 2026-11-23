@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: locate-app
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL        # Neon connection string (ends with ?sslmode=require)
+        sync: false
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: NODE_VERSION
+        value: 22
