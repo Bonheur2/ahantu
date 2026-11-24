@@ -6,7 +6,6 @@ const POOR_ACCURACY_M = 100;
 
 export default function ShareClient({ token, name, orgName }) {
   const storeKey = `locate-consent-${token}`;
-  const [consent, setConsent] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [canResume, setCanResume] = useState(false);
   const [status, setStatus] = useState("Sharing is stopped.");
@@ -142,23 +141,16 @@ export default function ShareClient({ token, name, orgName }) {
         <div className="unit-header"><h1>{name}, share your location?</h1></div>
         <div style={{ padding: 20 }}>
           <div className="consent" style={{ marginBottom: 16 }}>
-            {orgName ? `${orgName} is asking for your location. ` : ""}Precise browser location will be shared only after you confirm and approve browser permission.
+            {orgName ? `${orgName} is asking for your location. ` : ""}By tapping <b>Share my location</b> you agree to share your precise location. Your browser will then ask for permission.
             It updates live while this page stays open. You can stop sharing at any time.
           </div>
 
-          {canResume && !sharing && (
-            <div className="consent" style={{ marginBottom: 16, background: "#fff7e0" }}>
-              You were sharing earlier. <button className="btn primary" style={{ marginLeft: 8, minHeight: 32 }} onClick={begin}>Resume sharing</button>
-            </div>
-          )}
-
-          <label className="field" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <input type="checkbox" style={{ width: "auto", height: "auto", margin: 0 }} checked={consent} onChange={e => setConsent(e.target.checked)} />
-            I confirm that I, {name}, consent to share my location.
-          </label>
           <div className="actions" style={{ padding: 0 }}>
-            <button className="btn primary" disabled={!consent || sharing} onClick={begin}>Start sharing</button>
-            <button className="btn" disabled={!sharing} onClick={stop}>Stop sharing</button>
+            {!sharing ? (
+              <button className="btn primary" style={{ width: "100%", justifyContent: "center", minHeight: 48, fontSize: 16 }} onClick={begin}>Share my location</button>
+            ) : (
+              <button className="btn" style={{ width: "100%", justifyContent: "center", minHeight: 48, fontSize: 16 }} onClick={stop}>Stop sharing</button>
+            )}
           </div>
 
           <p>{status}</p>
