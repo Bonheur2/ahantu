@@ -5,11 +5,10 @@ const HEARTBEAT_MS = 10000; // re-send the last position so a stationary person 
 const POOR_ACCURACY_M = 100;
 
 export default function ShareClient({ token, name, orgName }) {
-  const storeKey = `locate-consent-${token}`;
   const [sharing, setSharing] = useState(false);
-  const [canResume, setCanResume] = useState(false);
-  const [status, setStatus] = useState("Sharing is stopped.");
+    const [status, setStatus] = useState("Asking your browser for permission - tap Allow.");
   const [accuracy, setAccuracy] = useState(null);
+  const [failed, setFailed] = useState(false);
   const watchId = useRef(null);
   const heartbeat = useRef(null);
   const lastPos = useRef(null);
@@ -58,8 +57,7 @@ export default function ShareClient({ token, name, orgName }) {
       return;
     }
     wanted.current = true;
-    try { localStorage.setItem(storeKey, "1"); } catch {}
-    setCanResume(false);
+    setFailed(false);
     setStatus("Requesting browser permission...");
     watchId.current = navigator.geolocation.watchPosition(
       position => {
@@ -88,24 +86,18 @@ export default function ShareClient({ token, name, orgName }) {
       error => {
         wanted.current = false;
         halt();
-        setStatus(`Sharing stopped (${error.code}): ${error.message}`);
+        setFailed(true);
+        setStatus(error.code === 1
+          ? "Location is blocked. Allow location for this site in your browser settings, then tap Share my location."
+          : `Could not get your location (${error.code}): ${error.message}`);
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
   }
 
-  function stop() {
-    wanted.current = false;
-    try { localStorage.removeItem(storeKey); } catch {}
-    halt();
-    setAccuracy(null);
-    setStatus("Sharing is stopped.");
-    fetch(`/api/location/${token}`, { method: "DELETE" });
-  }
-
   useEffect(() => {
-    // Reopening the link: offer one-tap resume (browser permission still applies).
-    try { if (localStorage.getItem(storeKey)) setCanResume(true); } catch {}
+    // Opening the link asks the browser for location right away (it still shows its own Allow/Block prompt).
+    begin();
 
     // Coming back to the page: browsers freeze/drop location in the background, so restart it.
     const onVisible = () => {
@@ -117,18 +109,9 @@ export default function ShareClient({ token, name, orgName }) {
         begin();
       }
     };
-    // Warn before the person navigates away: leaving the page stops tracking.
-    const onBeforeUnload = e => {
-      if (wanted.current) {
-        e.preventDefault();
-        e.returnValue = "";
-      }
-    };
     document.addEventListener("visibilitychange", onVisible);
-    window.addEventListener("beforeunload", onBeforeUnload);
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
-      window.removeEventListener("beforeunload", onBeforeUnload);
       wanted.current = false;
       halt();
     };
@@ -141,23 +124,21 @@ export default function ShareClient({ token, name, orgName }) {
         <div className="unit-header"><h1>{name}, share your location?</h1></div>
         <div style={{ padding: 20 }}>
           <div className="consent" style={{ marginBottom: 16 }}>
-            {orgName ? `${orgName} is asking for your location. ` : ""}By tapping <b>Share my location</b> you agree to share your precise location. Your browser will then ask for permission.
-            It updates live while this page stays open. You can stop sharing at any time.
+            {orgName ? `${orgName} is asking for your location. ` : ""}Opening this page asks your browser to share your precise location. Your browser will show an <b>Allow</b> / <b>Block</b> prompt, and nothing is shared unless you allow it.
+            Your location updates while this page stays open. To stop sharing, close this page.
           </div>
 
-          <div className="actions" style={{ padding: 0 }}>
-            {!sharing ? (
-              <button className="btn primary" style={{ width: "100%", justifyContent: "center", minHeight: 48, fontSize: 16 }} onClick={begin}>Share my location</button>
-            ) : (
-              <button className="btn" style={{ width: "100%", justifyContent: "center", minHeight: 48, fontSize: 16 }} onClick={stop}>Stop sharing</button>
-            )}
-          </div>
+          {failed && (
+            <div className="actions" style={{ padding: 0 }}>
+              <button className="btn primary" style={{ width: "100%", justifyContent: "center", minHeight: 48, fontSize: 16 }} onClick={begin}>Try again</button>
+            </div>
+          )}
 
           <p>{status}</p>
           {sharing && (
             <>
               <p style={{ fontSize: 13, color: "#667085" }}>
-                Leaving this page, switching apps or locking the phone pauses sharing. Keep it open on screen.
+                Closing this page, switching apps or locking the phone pauses sharing. Keep it open on screen.
               </p>
               {accuracy !== null && accuracy > POOR_ACCURACY_M && (
                 <p style={{ fontSize: 13, color: "#b54708", background: "#fffaeb", padding: 10, borderRadius: 8 }}>
