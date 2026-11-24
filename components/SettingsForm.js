@@ -95,7 +95,7 @@ export default function SettingsForm({ settings, options, status }) {
       </Card>
 
       <Card icon={<MapPin size={20} />} title="Location" desc="How shared coordinates are turned into places.">
-        <Row label="Place names (Google Maps)" hint={status.geocoding ? "Shows the street or area name next to the coordinates." : "Add GOOGLE_MAPS_API_KEY on the server to use this."}>
+        <Row label="Place names" hint={status.geocoding ? "Shows the village, cell and sector (Ahantu), or the street address (Google) next to the coordinates." : "Add AHANTU_API_KEY (Rwanda) or GOOGLE_MAPS_API_KEY on the server to use this."}>
           <button type="button" role="switch" aria-checked={form.geocodingEnabled} aria-label="Place names" className={"switch" + (form.geocodingEnabled ? " on" : "")} onClick={() => set("geocodingEnabled", !form.geocodingEnabled)} />
         </Row>
       </Card>
@@ -103,7 +103,8 @@ export default function SettingsForm({ settings, options, status }) {
       <Card icon={<Server size={20} />} title="System status" desc="Server configuration, read from environment variables.">
         <div className="status-grid">
           <Tile ok={status.database} label="Database" hint="Postgres on Neon" />
-          <Tile ok={status.geocoding} label="Google Maps key" hint="GOOGLE_MAPS_API_KEY" />
+          <Tile ok={status.ahantu} label="Ahantu key" hint="AHANTU_API_KEY - Rwanda place names" />
+          <Tile ok={status.google} label="Google Maps key" hint="GOOGLE_MAPS_API_KEY - fallback" />
           <Tile ok={status.adminPassword} label="Admin password" hint="ADMIN_PASSWORD" />
         </div>
       </Card>
