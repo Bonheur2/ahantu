@@ -32,7 +32,8 @@ export default function PersonDetail({ person, baseUrl, mapsKey }) {
   const [copied, setCopied] = useState(false);
   const [link, setLink] = useState("");
   const [now, setNow] = useState(null);
-  const [satellite, setSatellite] = useState(true);
+  const [mode, setMode] = useState("street"); // street | satellite | map
+  const [noStreet, setNoStreet] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const loc = person.location;
@@ -97,10 +98,12 @@ export default function PersonDetail({ person, baseUrl, mapsKey }) {
           {loc ? (
             <>
               <div className="d-map-wrap">
-                <LiveMap apiKey={mapsKey} latitude={loc.latitude} longitude={loc.longitude} accuracy={loc.accuracy} satellite={satellite} />
+                <LiveMap apiKey={mapsKey} latitude={loc.latitude} longitude={loc.longitude} accuracy={loc.accuracy} mode={mode} onNoStreetView={() => { setMode("satellite"); setNoStreet(true); }} />
+                {noStreet && <div className="map-note">No Street View imagery at this location.</div>}
                 <div className="map-toggle">
-                  <button type="button" className={satellite ? "on" : ""} onClick={() => setSatellite(true)}>Satellite</button>
-                  <button type="button" className={!satellite ? "on" : ""} onClick={() => setSatellite(false)}>Map</button>
+                  <button type="button" className={mode === "satellite" ? "on" : ""} onClick={() => { setNoStreet(false); setMode("satellite"); }}>Satellite</button>
+                  <button type="button" className={mode === "map" ? "on" : ""} onClick={() => { setNoStreet(false); setMode("map"); }}>Map</button>
+                  <button type="button" className={mode === "street" ? "on" : ""} onClick={() => { setNoStreet(false); setMode("street"); }}>Street View</button>
                 </div>
               </div>
               <div className="d-fields">

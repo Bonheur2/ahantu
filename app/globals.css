@@ -363,3 +363,5 @@ body, button, input, select, textarea { font-family:var(--font-poppins), Poppins
 .state-card { text-align:center; padding:40px 28px 36px; }
 .state-icon { width:64px; height:64px; border-radius:50%; background:#fff5df; color:#f28a00; display:grid; place-items:center; margin:0 auto 20px; box-shadow:0 0 0 10px #fffaf0; }
 .state-card .login-sub { margin:0 auto; max-width:300px; line-height:1.6; }
+
+.map-note { position:absolute; top:56px; left:12px; z-index:1000; background:#111827e6; color:#fff; font-size:12px; font-weight:500; padding:8px 12px; border-radius:8px; }
