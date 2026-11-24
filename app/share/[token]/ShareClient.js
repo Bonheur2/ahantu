@@ -27,7 +27,7 @@ export default function ShareClient({ token, name, orgName }) {
       if (res.status === 410) {
         wanted.current = false;
         halt();
-        setStatus("This link has expired. Sharing stopped.");
+        window.location.reload(); // the page now renders the "link expired" screen
       }
     } catch {
       setStatus("Connection problem - retrying...");
@@ -121,7 +121,7 @@ export default function ShareClient({ token, name, orgName }) {
   return (
     <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 20 }}>
       <section className="unit-card" style={{ width: "min(520px,100%)", margin: 0 }}>
-        <div className="unit-header"><h1>Welcome, {name}</h1></div>
+        <div className="unit-header" style={{ justifyContent: "center", textAlign: "center" }}><h1>Welcome, {name}</h1></div>
         <div style={{ padding: 20, textAlign: "center" }}>
           <div className="consent" style={{ marginBottom: 16 }}>
             {orgName ? `${orgName} is asking for your location. ` : ""}Tap <b>Allow</b> 
