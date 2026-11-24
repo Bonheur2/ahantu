@@ -326,7 +326,7 @@ function recipientPage(person) {
   return page(`${name} - Location consent`, `
     <main style="min-height:100vh;display:grid;place-items:center;padding:20px">
       <section class="unit-card" style="width:min(520px,100%);margin:0">
-        <div class="unit-header"><h1>${name}, share your location?</h1></div>
+        <div class="unit-header"><h1>Welcome, ${name}</h1></div>
         <div style="padding:20px">
           <div class="consent" style="margin-bottom:16px">
             Precise browser location will be shared only after you confirm and approve browser permission.

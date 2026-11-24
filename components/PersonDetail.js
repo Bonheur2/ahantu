@@ -24,7 +24,7 @@ function Field({ label, children }) {
   );
 }
 
-export default function PersonDetail({ person, baseUrl }) {
+export default function PersonDetail({ person, baseUrl, mapsKey }) {
   const router = useRouter();
   const [name, setName] = useState(person.name);
   const [memberNo, setMemberNo] = useState(person.memberNo);
@@ -97,7 +97,7 @@ export default function PersonDetail({ person, baseUrl }) {
           {loc ? (
             <>
               <div className="d-map-wrap">
-                <LiveMap latitude={loc.latitude} longitude={loc.longitude} accuracy={loc.accuracy} satellite={satellite} />
+                <LiveMap apiKey={mapsKey} latitude={loc.latitude} longitude={loc.longitude} accuracy={loc.accuracy} satellite={satellite} />
                 <div className="map-toggle">
                   <button type="button" className={satellite ? "on" : ""} onClick={() => setSatellite(true)}>Satellite</button>
                   <button type="button" className={!satellite ? "on" : ""} onClick={() => setSatellite(false)}>Map</button>
