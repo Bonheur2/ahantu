@@ -6,7 +6,7 @@ const POOR_ACCURACY_M = 100;
 
 export default function ShareClient({ token, name, orgName }) {
   const [sharing, setSharing] = useState(false);
-    const [status, setStatus] = useState("Asking your browser for permission - tap Allow.");
+    const [status, setStatus] = useState("Waiting for permission...");
   const [accuracy, setAccuracy] = useState(null);
   const [failed, setFailed] = useState(false);
   const watchId = useRef(null);
@@ -58,7 +58,7 @@ export default function ShareClient({ token, name, orgName }) {
     }
     wanted.current = true;
     setFailed(false);
-    setStatus("Requesting browser permission...");
+    setStatus("Waiting for permission...");
     watchId.current = navigator.geolocation.watchPosition(
       position => {
         const location = {
@@ -71,7 +71,7 @@ export default function ShareClient({ token, name, orgName }) {
         lastPos.current = location;
         setSharing(true);
         setAccuracy(Math.round(position.coords.accuracy));
-        setStatus(`${name} is actively sharing. Keep this page open.`);
+        setStatus("Sharing live. Keep this page open.");
         if (first || Date.now() - lastSent.current >= 2000) {
           lastSent.current = Date.now();
           send(location);
@@ -88,8 +88,8 @@ export default function ShareClient({ token, name, orgName }) {
         halt();
         setFailed(true);
         setStatus(error.code === 1
-          ? "Location is blocked. Allow location for this site in your browser settings, then tap Share my location."
-          : `Could not get your location (${error.code}): ${error.message}`);
+          ? "Location is blocked. Allow it in your browser settings, then try again."
+          : "Could not get your location.");
       },
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
     );
@@ -121,11 +121,10 @@ export default function ShareClient({ token, name, orgName }) {
   return (
     <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 20 }}>
       <section className="unit-card" style={{ width: "min(520px,100%)", margin: 0 }}>
-        <div className="unit-header"><h1>{name}, share your location?</h1></div>
+        <div className="unit-header"><h1>{name}, share your location</h1></div>
         <div style={{ padding: 20 }}>
           <div className="consent" style={{ marginBottom: 16 }}>
-            {orgName ? `${orgName} is asking for your location. ` : ""}Opening this page asks your browser to share your precise location. Your browser will show an <b>Allow</b> / <b>Block</b> prompt, and nothing is shared unless you allow it.
-            Your location updates while this page stays open. To stop sharing, close this page.
+            {orgName ? `${orgName} is asking for your location. ` : ""}Tap <b>Allow</b> to share. Close this page to stop.
           </div>
 
           {failed && (
@@ -134,18 +133,9 @@ export default function ShareClient({ token, name, orgName }) {
             </div>
           )}
 
-          <p>{status}</p>
-          {sharing && (
-            <>
-              <p style={{ fontSize: 13, color: "#667085" }}>
-                Closing this page, switching apps or locking the phone pauses sharing. Keep it open on screen.
-              </p>
-              {accuracy !== null && accuracy > POOR_ACCURACY_M && (
-                <p style={{ fontSize: 13, color: "#b54708", background: "#fffaeb", padding: 10, borderRadius: 8 }}>
-                  Your location is only accurate to about {accuracy} m. For a better reading, use a phone outdoors with Precise location allowed.
-                </p>
-              )}
-            </>
+          <p style={{ margin: 0 }}>{status}</p>
+          {sharing && accuracy !== null && accuracy > POOR_ACCURACY_M && (
+            <p style={{ fontSize: 13, color: "#b54708", margin: "10px 0 0" }}>Low accuracy (about {accuracy} m). Try a phone outdoors.</p>
           )}
         </div>
       </section>
