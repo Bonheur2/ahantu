@@ -3,6 +3,7 @@ import { ArrowLeft, Link2, MapPin, Pencil, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 import LiveMap from "./LiveMap";
 import { shareUrl } from "./PersonActions";
 
@@ -32,6 +33,7 @@ export default function PersonDetail({ person, baseUrl }) {
   const [link, setLink] = useState("");
   const [now, setNow] = useState(null);
   const [satellite, setSatellite] = useState(true);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const loc = person.location;
   const dirty = name !== person.name || memberNo !== person.memberNo;
@@ -64,8 +66,8 @@ export default function PersonDetail({ person, baseUrl }) {
   }
 
   async function remove() {
-    if (!confirm(`Remove ${person.name}? This cannot be undone.`)) return;
-    await fetch(`/api/people/${person.id}`, { method: "DELETE" });
+    const res = await fetch(`/api/people/${person.id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("delete failed");
     router.push("/people");
     router.refresh();
   }
@@ -145,8 +147,9 @@ export default function PersonDetail({ person, baseUrl }) {
           </section>
 
           <section className="s-card danger">
-            <div className="s-head"><div className="s-icon"><TriangleAlert size={20} /></div><div><h2>Remove person</h2><p>Deletes this person and their link permanently.</p></div></div>
-            <div style={{ padding: "6px 22px 20px" }}><button className="btn danger" onClick={remove}>Remove {person.name}</button></div>
+            <div className="s-head"><div className="s-icon"><TriangleAlert size={20} /></div><div><h2>Delete person</h2><p>Deletes this person and their link permanently.</p></div></div>
+            <div style={{ padding: "6px 22px 20px" }}><button className="btn danger" onClick={() => setConfirmOpen(true)}>Delete {person.name}</button>
+              <ConfirmDeleteDialog open={confirmOpen} name={person.name} onConfirm={remove} onClose={() => setConfirmOpen(false)} /></div>
           </section>
         </div>
       </div>

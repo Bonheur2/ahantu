@@ -1,6 +1,8 @@
 "use client";
 import { Copy, ExternalLink, RefreshCw, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import ConfirmDeleteDialog from "./ConfirmDeleteDialog";
 
 export function shareUrl(token, baseUrl) {
   return `${baseUrl || window.location.origin}/share/${token}`;
@@ -8,10 +10,12 @@ export function shareUrl(token, baseUrl) {
 
 export default function PersonActions({ person, baseUrl }) {
   const router = useRouter();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   async function remove() {
-    if (!confirm(`Remove ${person.name}?`)) return;
-    await fetch(`/api/people/${person.id}`, { method: "DELETE" });
+    const res = await fetch(`/api/people/${person.id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("delete failed");
+    setConfirmOpen(false);
     router.refresh();
   }
   async function renew() {
@@ -24,7 +28,8 @@ export default function PersonActions({ person, baseUrl }) {
       <a className="icon-btn" href={`/share/${person.shareToken}`} target="_blank" rel="noreferrer" title="Open sharing link"><ExternalLink size={16} /></a>
       <button className="icon-btn" title="Copy link" onClick={() => navigator.clipboard.writeText(shareUrl(person.shareToken, baseUrl))}><Copy size={16} /></button>
       <button className="icon-btn" title="Renew link (new token, resets expiry)" onClick={renew}><RefreshCw size={16} /></button>
-      <button className="icon-btn danger" title="Remove" onClick={remove}><Trash2 size={16} /></button>
+      <button className="icon-btn danger" title="Delete" onClick={() => setConfirmOpen(true)}><Trash2 size={16} /></button>
+      <ConfirmDeleteDialog open={confirmOpen} name={person.name} onConfirm={remove} onClose={() => setConfirmOpen(false)} />
     </div>
   );
 }

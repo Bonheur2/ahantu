@@ -333,3 +333,16 @@ body, button, input, select, textarea { font-family:var(--font-poppins), Poppins
 @keyframes livepulse { 70% { box-shadow:0 0 0 14px rgba(47,128,237,0), 0 2px 6px rgba(0,0,0,.4); } 100% { box-shadow:0 0 0 0 rgba(47,128,237,0), 0 2px 6px rgba(0,0,0,.4); } }
 .recenter { position:absolute; bottom:14px; left:12px; z-index:1000; border:0; border-radius:8px; background:#ffc107; color:#18202f; font-weight:600; font-size:12px; padding:8px 14px; box-shadow:0 2px 8px rgba(0,0,0,.3); }
 .map-toggle { z-index:1000; }
+
+/* ---------- Delete confirmation dialog ---------- */
+.confirm-dialog { width:min(400px,calc(100vw - 32px)); }
+.confirm-dialog[open] { animation:confirm-in .16s ease-out; }
+@keyframes confirm-in { from { opacity:0; transform:translateY(8px) scale(.98); } to { opacity:1; transform:none; } }
+.confirm-body { padding:28px 26px 22px; text-align:center; }
+.confirm-icon { width:56px; height:56px; border-radius:50%; background:#fff0f1; color:#f04458; display:grid; place-items:center; margin:0 auto 16px; box-shadow:0 0 0 8px #fff7f8; }
+.confirm-body h2 { margin:0 0 8px; font-size:18px; }
+.confirm-body p { margin:0 0 6px; color:#667085; font-size:14px; line-height:1.55; }
+.confirm-actions { display:flex; gap:10px; margin-top:22px; }
+.confirm-actions .btn { flex:1; justify-content:center; min-height:44px; }
+.btn.danger-solid { background:#f04458; border-color:#f04458; color:#fff; }
+.btn.danger-solid:hover:not(:disabled) { background:#d92d3f; border-color:#d92d3f; }
